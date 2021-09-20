@@ -25,33 +25,6 @@ const typeDefs = gql`
     createdAt: DateTime! @timestamp(operations: [CREATE])
     updatedAt: DateTime @timestamp(operations: [UPDATE])
   }
-  extend type Comment
-    @auth(
-      rules: [
-        { operations: [CREATE], bind: { author: { id: "$jwt.sub" } } }
-        {
-          operations: [UPDATE, CONNECT]
-          allow: { author: { id: "$jwt.sub" } }
-          bind: { author: { id: "$jwt.sub" } }
-        }
-        {
-          operations: [DELETE, DISCONNECT]
-          allow: {
-            OR: [
-              { author: { id: "$jwt.sub" } }
-              {
-                post: {
-                  OR: [
-                    { author: { id: "$jwt.sub" } }
-                    { blog: { creator: { id: "$jwt.sub" } } }
-                  ]
-                }
-              }
-            ]
-          }
-        }
-      ]
-    )
 `
 
 export const Comment = { typeDefs }

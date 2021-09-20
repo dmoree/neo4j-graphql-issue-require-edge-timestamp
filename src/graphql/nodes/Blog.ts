@@ -26,37 +26,6 @@ const typeDefs = gql`
     createdAt: DateTime! @timestamp(operations: [CREATE])
     updatedAt: DateTime @timestamp(operations: [UPDATE])
   }
-  extend type Blog
-    @auth(
-      rules: [
-        { operations: [CREATE], bind: { creator: { id: "$jwt.sub" } } }
-        {
-          operations: [UPDATE]
-          allow: { creator: { id: "$jwt.sub" } }
-          bind: { creator: { id: "$jwt.sub" } }
-        }
-        {
-          operations: [CONNECT]
-          allow: {
-            OR: [
-              { creator: { id: "$jwt.sub" } }
-              { authors: { id: "$jwt.sub" } }
-            ]
-          }
-        }
-        {
-          operations: [DISCONNECT]
-          allow: {
-            OR: [
-              { creator: { id: "$jwt.sub" } }
-              { authors: { id: "$jwt.sub" } }
-              { posts: { author: { id: "$jwt.sub" } } }
-            ]
-          }
-        }
-        { operations: [DELETE], allow: { creator: { id: "$jwt.sub" } } }
-      ]
-    )
 `
 
 export const Blog = { typeDefs }

@@ -12,42 +12,6 @@ const typeDefs = gql`
     createdAt: DateTime! @timestamp(operations: [CREATE])
     updatedAt: DateTime @timestamp(operations: [UPDATE])
   }
-  extend type User
-    @auth(
-      rules: [
-        { operations: [CONNECT], isAuthenticated: true }
-        {
-          operations: [UPDATE]
-          allow: { id: "$jwt.sub" }
-          bind: { id: "$jwt.sub" }
-        }
-        { operations: [DELETE], allow: { id: "$jwt.sub" } }
-        {
-          operations: [DISCONNECT]
-          allow: {
-            OR: [
-              { id: "$jwt.sub" }
-              {
-                createdBlogs: {
-                  OR: [
-                    { creator: { id: "$jwt.sub" } }
-                    { authors: { id: "$jwt.sub" } }
-                  ]
-                }
-              }
-              {
-                authorsBlogs: {
-                  OR: [
-                    { creator: { id: "$jwt.sub" } }
-                    { authors: { id: "$jwt.sub" } }
-                  ]
-                }
-              }
-            ]
-          }
-        }
-      ]
-    )
   type Mutation {
     signUp(email: String!, password: String!): String # JWT
     signIn(email: String!, password: String!): String # JWT

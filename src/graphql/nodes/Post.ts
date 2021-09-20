@@ -1,6 +1,11 @@
 import { gql } from 'graphql-tag'
 
 const typeDefs = gql`
+  interface UserReviewedPost {
+    lastReviewed: DateTime! @timestamp
+    ignore: Boolean
+  }
+
   type Post {
     id: ID! @id
     title: String!
@@ -8,6 +13,12 @@ const typeDefs = gql`
     blog: Blog! @relationship(type: "HAS_POST", direction: IN)
     comments: [Comment!]! @relationship(type: "HAS_COMMENT", direction: OUT)
     author: User! @relationship(type: "WROTE", direction: IN)
+    reviewers: [User!]!
+      @relationship(
+        type: "REVIEWED"
+        direction: IN
+        properties: "UserReviewedPost"
+      )
     canEdit: Boolean!
       @cypher(
         statement: """
@@ -39,38 +50,6 @@ const typeDefs = gql`
     createdAt: DateTime @timestamp(operations: [CREATE])
     updatedAt: DateTime @timestamp(operations: [UPDATE])
   }
-  extend type Post
-    @auth(
-      rules: [
-        { operations: [CREATE], bind: { author: { id: "$jwt.sub" } } }
-        {
-          operations: [UPDATE]
-          allow: {
-            OR: [
-              { author: { id: "$jwt.sub" } }
-              {
-                blog: {
-                  OR: [
-                    { creator: { id: "$jwt.sub" } }
-                    { authors: { id: "$jwt.sub" } }
-                  ]
-                }
-              }
-            ]
-          }
-        }
-        { operations: [CONNECT], isAuthenticated: true }
-        {
-          operations: [DELETE, DISCONNECT]
-          allow: {
-            OR: [
-              { author: { id: "$jwt.sub" } }
-              { blog: { creator: { id: "$jwt.sub" } } }
-            ]
-          }
-        }
-      ]
-    )
 `
 
 export const Post = { typeDefs }
