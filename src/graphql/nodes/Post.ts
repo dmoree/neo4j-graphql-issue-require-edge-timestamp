@@ -3,7 +3,6 @@ import { gql } from 'graphql-tag'
 const typeDefs = gql`
   interface UserReviewedPost {
     lastReviewed: DateTime! @timestamp
-    ignore: Boolean
   }
 
   type Post {
